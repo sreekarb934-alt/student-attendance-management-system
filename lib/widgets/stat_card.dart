@@ -31,13 +31,13 @@ class StatCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Top Row: Icon Container & Optional Badge
+            // Top Row: Icon Container & Optional Flexible Badge
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Container(
-                  width: 40,
-                  height: 40,
+                  width: 38,
+                  height: 38,
                   decoration: BoxDecoration(
                     color: iconBackgroundColor,
                     borderRadius: BorderRadius.circular(10),
@@ -45,25 +45,31 @@ class StatCard extends StatelessWidget {
                   child: Icon(
                     icon,
                     color: iconColor,
-                    size: 22,
+                    size: 20,
                   ),
                 ),
-                if (badgeText != null)
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
-                    decoration: BoxDecoration(
-                      color: badgeColor ?? iconBackgroundColor,
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Text(
-                      badgeText!,
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w700,
-                        color: iconColor,
+                if (badgeText != null) ...[
+                  const SizedBox(width: 4),
+                  Flexible(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: badgeColor ?? iconBackgroundColor,
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: Text(
+                        badgeText!,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w700,
+                          color: iconColor,
+                        ),
                       ),
                     ),
                   ),
+                ],
               ],
             ),
             const SizedBox(height: 12),
@@ -71,8 +77,10 @@ class StatCard extends StatelessWidget {
             // Middle: Bold Metric Value
             Text(
               value,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: const TextStyle(
-                fontSize: 24,
+                fontSize: 22,
                 fontWeight: FontWeight.w800,
                 color: Color(0xFF0F172A),
                 height: 1.1,

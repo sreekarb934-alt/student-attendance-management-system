@@ -3,7 +3,7 @@ import '../models/student.dart';
 import '../theme/app_theme.dart';
 import 'attendance_screen.dart';
 import 'dashboard_screen.dart';
-import 'placeholder_screen.dart';
+import 'reports_screen.dart';
 import 'students_screen.dart';
 
 /// The root scaffold of the application managing responsive navigation
@@ -120,12 +120,9 @@ class _MainScreenState extends State<MainScreen> {
         onUpdateStatus: _handleUpdateStatus,
         onMarkAllStatus: _handleMarkAllStatus,
       ),
-      PlaceholderScreen(
-        title: 'Attendance Reports',
-        description:
-            'Analyze monthly attendance percentages, export registers, and identify shortage lists.',
-        icon: Icons.assessment_rounded,
-        onReturnHome: () => _onDestinationSelected(0),
+      ReportsScreen(
+        students: _students,
+        onNavigateToTab: _onDestinationSelected,
       ),
     ];
 

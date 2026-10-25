@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:student_attendance/main.dart';
+import 'package:student_attendance/models/student.dart';
+import 'package:student_attendance/screens/reports_screen.dart';
 
 void main() {
   testWidgets('Dashboard loads and renders attendance metrics and student records',
@@ -21,15 +23,18 @@ void main() {
     expect(find.text('Present Today'), findsOneWidget);
     expect(find.text('Absent Today'), findsOneWidget);
 
-    // Verify Sample Student Data
-    expect(find.text('Aarav Sharma'), findsOneWidget);
-    expect(find.text('21A91A0501'), findsOneWidget);
-
     // Verify Navigation Destinations
     expect(find.text('Dashboard'), findsOneWidget);
-    expect(find.text('Students'), findsOneWidget);
+    expect(find.text('Students'), findsWidgets);
     expect(find.text('Attendance'), findsOneWidget);
-    expect(find.text('Reports'), findsOneWidget);
+    expect(find.text('Reports'), findsWidgets);
+
+    // Scroll down to reveal student records in the ListView
+    await tester.drag(find.byType(ListView).first, const Offset(0, -250));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Aarav Sharma'), findsOneWidget);
+    expect(find.text('21A91A0501'), findsOneWidget);
   });
 
   testWidgets('Filter chips filter student list correctly',
@@ -40,6 +45,10 @@ void main() {
     addTearDown(tester.view.resetDevicePixelRatio);
 
     await tester.pumpWidget(const StudentAttendanceApp());
+    await tester.pumpAndSettle();
+
+    // Scroll to student list
+    await tester.drag(find.byType(ListView).first, const Offset(0, -250));
     await tester.pumpAndSettle();
 
     // Initially both present and absent students are visible
@@ -87,8 +96,8 @@ void main() {
     await tester.pumpWidget(const StudentAttendanceApp());
     await tester.pumpAndSettle();
 
-    // Navigate to Students screen
-    await tester.tap(find.text('Students'));
+    // Navigate to Students screen via bottom navigation destination
+    await tester.tap(find.byIcon(Icons.people_outline_rounded));
     await tester.pumpAndSettle();
 
     // Tap on FloatingActionButton to open Add Student dialog
@@ -122,7 +131,7 @@ void main() {
     await tester.pumpAndSettle();
 
     // Navigate to Students screen
-    await tester.tap(find.text('Students'));
+    await tester.tap(find.byIcon(Icons.people_outline_rounded));
     await tester.pumpAndSettle();
 
     // Open Add Student dialog
@@ -158,7 +167,7 @@ void main() {
     await tester.pumpAndSettle();
 
     // Navigate to Students screen
-    await tester.tap(find.text('Students'));
+    await tester.tap(find.byIcon(Icons.people_outline_rounded));
     await tester.pumpAndSettle();
 
     // Open Add Student dialog
@@ -179,7 +188,7 @@ void main() {
     expect(find.text('21A91A0511'), findsOneWidget);
 
     // Navigate back to Dashboard
-    await tester.tap(find.text('Dashboard'));
+    await tester.tap(find.byIcon(Icons.dashboard_outlined));
     await tester.pumpAndSettle();
 
     // Total should now be 11, Present should be 8
@@ -201,7 +210,7 @@ void main() {
     await tester.pumpAndSettle();
 
     // Navigate to Attendance screen
-    await tester.tap(find.text('Attendance'));
+    await tester.tap(find.byIcon(Icons.how_to_reg_outlined));
     await tester.pumpAndSettle();
 
     expect(find.text('Mark Today\'s Attendance'), findsOneWidget);
@@ -214,10 +223,151 @@ void main() {
     expect(find.text('Marked all students as Present!'), findsOneWidget);
 
     // Navigate back to Dashboard
-    await tester.tap(find.text('Dashboard'));
+    await tester.tap(find.byIcon(Icons.dashboard_outlined));
     await tester.pumpAndSettle();
 
     // Dashboard should now show all 10 present (0 absent)
     expect(find.text('10/10 (100%)'), findsOneWidget);
+  });
+
+  testWidgets(
+      'Reports screen displays metrics, department summaries, and student breakdowns',
+      (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(412, 915);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const StudentAttendanceApp());
+    await tester.pumpAndSettle();
+
+    // Navigate to Reports screen via NavigationBar
+    await tester.tap(find.byIcon(Icons.assessment_outlined));
+    await tester.pumpAndSettle();
+
+    // Verify Header and Notice
+    expect(find.text('Attendance Analytics & Reports'), findsOneWidget);
+    expect(find.text('Session Snapshot'), findsOneWidget);
+
+    // Verify Summary Cards in Reports
+    expect(find.text('Total Enrolled'), findsOneWidget);
+    expect(find.text('Overall Attendance Ratio'), findsOneWidget);
+    expect(find.text('Department-Wise Attendance'), findsOneWidget);
+    expect(find.text('CSE - Section A'), findsOneWidget);
+
+    // Scroll to reveal student breakdown section
+    await tester.drag(find.byType(ListView).first, const Offset(0, -600));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Student-Wise Attendance Register'), findsOneWidget);
+    expect(find.text('Aarav Sharma'), findsOneWidget);
+  });
+
+  testWidgets(
+      'Reports screen reflects live attendance updates when attendance changes',
+      (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(412, 915);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const StudentAttendanceApp());
+    await tester.pumpAndSettle();
+
+    // Navigate to Attendance and Mark All Absent
+    await tester.tap(find.byIcon(Icons.how_to_reg_outlined));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Mark All Absent'));
+    await tester.pumpAndSettle();
+
+    // Navigate to Reports screen
+    await tester.tap(find.byIcon(Icons.assessment_outlined));
+    await tester.pumpAndSettle();
+
+    // Now Attendance Rate in Reports should show 0.0%
+    expect(find.text('0.0%'), findsWidgets);
+    expect(find.text('Absent Today'), findsOneWidget);
+    expect(find.text('Attendance Shortage (<75%)'), findsOneWidget);
+  });
+
+  testWidgets(
+      'Reports screen handles empty student list safely without division by zero',
+      (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(412, 915);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    // Render ReportsScreen directly with an empty student list
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(
+          body: ReportsScreen(students: []),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // Metrics should display 0 and 0.0% safely
+    expect(find.text('Total Enrolled'), findsOneWidget);
+    expect(find.text('0.0%'), findsOneWidget);
+    expect(find.text('No Department Data Available'), findsOneWidget);
+    expect(find.text('No Data'), findsWidgets);
+  });
+
+  testWidgets(
+      'Department breakdown groups students correctly across multiple departments',
+      (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(412, 915);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    const testStudents = [
+      Student(
+        id: '1',
+        name: 'Student CSE 1',
+        rollNumber: 'CSE01',
+        department: 'CSE - Section A',
+        status: AttendanceStatus.present,
+      ),
+      Student(
+        id: '2',
+        name: 'Student CSE 2',
+        rollNumber: 'CSE02',
+        department: 'CSE - Section A',
+        status: AttendanceStatus.absent,
+      ),
+      Student(
+        id: '3',
+        name: 'Student ECE 1',
+        rollNumber: 'ECE01',
+        department: 'ECE - Section A',
+        status: AttendanceStatus.present,
+      ),
+    ];
+
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(
+          body: ReportsScreen(students: testStudents),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // Both departments should be rendered
+    expect(find.text('2 Departments'), findsOneWidget);
+    expect(find.text('CSE - Section A'), findsOneWidget);
+    expect(find.text('ECE - Section A'), findsOneWidget);
+
+    // CSE: 1 present of 2 (50.0%)
+    expect(find.text('Present: 1 of 2'), findsOneWidget);
+    expect(find.text('50.0%'), findsOneWidget);
+
+    // ECE: 1 present of 1 (100.0%)
+    expect(find.text('Present: 1 of 1'), findsOneWidget);
+    expect(find.text('100.0%'), findsOneWidget);
   });
 }

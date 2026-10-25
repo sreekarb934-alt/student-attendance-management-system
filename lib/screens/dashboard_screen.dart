@@ -140,37 +140,51 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ],
           ),
           if (widget.onNavigateToTab != null) ...[
-            const SizedBox(height: 14),
-            const Divider(),
-            const SizedBox(height: 10),
+            const SizedBox(height: 12),
             Wrap(
-              spacing: 10,
-              runSpacing: 8,
+              spacing: 8,
+              runSpacing: 6,
               children: [
                 OutlinedButton.icon(
                   onPressed: () => widget.onNavigateToTab!(2), // Index 2 = Attendance
-                  icon: const Icon(Icons.how_to_reg_rounded, size: 16),
-                  label: const Text('Mark Attendance'),
+                  icon: const Icon(Icons.how_to_reg_rounded, size: 14),
+                  label: const Text('Mark Attendance', style: TextStyle(fontSize: 12)),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppTheme.primaryBlue,
                     side: const BorderSide(color: AppTheme.primaryBlue),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    visualDensity: VisualDensity.compact,
                   ),
                 ),
                 OutlinedButton.icon(
                   onPressed: () => widget.onNavigateToTab!(1), // Index 1 = Students
-                  icon: const Icon(Icons.person_add_alt_1_rounded, size: 16),
-                  label: const Text('Manage Students'),
+                  icon: const Icon(Icons.people_alt_rounded, size: 14),
+                  label: const Text('Students', style: TextStyle(fontSize: 12)),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppTheme.textSecondary,
                     side: const BorderSide(color: AppTheme.borderLight),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    visualDensity: VisualDensity.compact,
+                  ),
+                ),
+                OutlinedButton.icon(
+                  onPressed: () => widget.onNavigateToTab!(3), // Index 3 = Reports
+                  icon: const Icon(Icons.analytics_rounded, size: 14),
+                  label: const Text('Reports', style: TextStyle(fontSize: 12)),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppTheme.textSecondary,
+                    side: const BorderSide(color: AppTheme.borderLight),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    visualDensity: VisualDensity.compact,
                   ),
                 ),
               ],
