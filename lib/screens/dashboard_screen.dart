@@ -5,9 +5,19 @@ import '../widgets/stat_card.dart';
 import '../widgets/student_attendance_tile.dart';
 
 /// The primary Dashboard screen for the Student Attendance system.
-/// Displays high-level attendance metrics and the daily student attendance list.
+/// Displays high-level attendance metrics, quick navigation shortcuts,
+/// and the real-time student attendance list.
 class DashboardScreen extends StatefulWidget {
-  const DashboardScreen({super.key});
+  final List<Student>? students;
+  final ValueChanged<int>? onNavigateToTab;
+  final ValueChanged<String>? onToggleAttendance;
+
+  const DashboardScreen({
+    super.key,
+    this.students,
+    this.onNavigateToTab,
+    this.onToggleAttendance,
+  });
 
   @override
   State<DashboardScreen> createState() => _DashboardScreenState();
@@ -17,21 +27,22 @@ class _DashboardScreenState extends State<DashboardScreen> {
   // Active filter: null = All, present, or absent
   AttendanceStatus? _filterStatus;
 
-  // In-memory student dataset for Commit 1
-  final List<Student> _students = MockStudentData.students;
+  // Use passed-in students if available, otherwise fall back to sample dataset
+  List<Student> get _currentStudents =>
+      widget.students ?? MockStudentData.students;
 
-  int get _totalCount => _students.length;
+  int get _totalCount => _currentStudents.length;
   int get _presentCount =>
-      _students.where((s) => s.status == AttendanceStatus.present).length;
+      _currentStudents.where((s) => s.status == AttendanceStatus.present).length;
   int get _absentCount =>
-      _students.where((s) => s.status == AttendanceStatus.absent).length;
+      _currentStudents.where((s) => s.status == AttendanceStatus.absent).length;
 
   double get _attendanceRate =>
       _totalCount > 0 ? (_presentCount / _totalCount) * 100 : 0.0;
 
   List<Student> get _filteredStudents {
-    if (_filterStatus == null) return _students;
-    return _students.where((s) => s.status == _filterStatus).toList();
+    if (_filterStatus == null) return _currentStudents;
+    return _currentStudents.where((s) => s.status == _filterStatus).toList();
   }
 
   @override
@@ -50,8 +61,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 vertical: 16.0,
               ),
               children: [
-                // 1. Welcome & Session Banner
-                _buildWelcomeHeader(),
+                // 1. Welcome & Session Banner with Quick Actions
+                _buildWelcomeHeader(isWideScreen),
                 const SizedBox(height: 16),
 
                 // 2. Summary Metric Cards (Total, Present, Absent)
@@ -76,8 +87,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  /// Header with date and current classroom section
-  Widget _buildWelcomeHeader() {
+  /// Header with date, class section, and quick navigation shortcuts
+  Widget _buildWelcomeHeader(bool isWideScreen) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -85,44 +96,86 @@ class _DashboardScreenState extends State<DashboardScreen> {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppTheme.borderLight),
       ),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: AppTheme.primaryLightBlue,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: const Icon(
-              Icons.calendar_today_rounded,
-              color: AppTheme.primaryBlue,
-              size: 22,
-            ),
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: AppTheme.primaryLightBlue,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(
+                  Icons.calendar_today_rounded,
+                  color: AppTheme.primaryBlue,
+                  size: 22,
+                ),
+              ),
+              const SizedBox(width: 14),
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Today's Attendance Overview",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: AppTheme.textPrimary,
+                      ),
+                    ),
+                    SizedBox(height: 3),
+                    Text(
+                      'Department of CSE • Section A',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppTheme.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-          const SizedBox(width: 14),
-          const Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          if (widget.onNavigateToTab != null) ...[
+            const SizedBox(height: 14),
+            const Divider(),
+            const SizedBox(height: 10),
+            Wrap(
+              spacing: 10,
+              runSpacing: 8,
               children: [
-                Text(
-                  "Today's Attendance Overview",
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: AppTheme.textPrimary,
+                OutlinedButton.icon(
+                  onPressed: () => widget.onNavigateToTab!(2), // Index 2 = Attendance
+                  icon: const Icon(Icons.how_to_reg_rounded, size: 16),
+                  label: const Text('Mark Attendance'),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppTheme.primaryBlue,
+                    side: const BorderSide(color: AppTheme.primaryBlue),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                   ),
                 ),
-                SizedBox(height: 3),
-                Text(
-                  'Department of CSE • Section A',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: AppTheme.textSecondary,
+                OutlinedButton.icon(
+                  onPressed: () => widget.onNavigateToTab!(1), // Index 1 = Students
+                  icon: const Icon(Icons.person_add_alt_1_rounded, size: 16),
+                  label: const Text('Manage Students'),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppTheme.textSecondary,
+                    side: const BorderSide(color: AppTheme.borderLight),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                   ),
                 ),
               ],
             ),
-          ),
+          ],
         ],
       ),
     );
@@ -381,7 +434,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
       separatorBuilder: (context, index) => const SizedBox(height: 8),
       itemBuilder: (context, index) {
         final student = _filteredStudents[index];
-        return StudentAttendanceTile(student: student);
+        return StudentAttendanceTile(
+          student: student,
+          onToggleStatus: widget.onToggleAttendance != null
+              ? () => widget.onToggleAttendance!(student.id)
+              : null,
+        );
       },
     );
   }

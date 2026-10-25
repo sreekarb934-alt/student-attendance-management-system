@@ -32,6 +32,26 @@ class Student {
     }
     return '?';
   }
+
+  /// Creates a copy of this student with the given fields replaced.
+  Student copyWith({
+    String? id,
+    String? name,
+    String? rollNumber,
+    String? department,
+    AttendanceStatus? status,
+    String? timeMarked,
+    bool clearTimeMarked = false,
+  }) {
+    return Student(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      rollNumber: rollNumber ?? this.rollNumber,
+      department: department ?? this.department,
+      status: status ?? this.status,
+      timeMarked: clearTimeMarked ? null : (timeMarked ?? this.timeMarked),
+    );
+  }
 }
 
 /// Sample in-memory dataset for UI development and demonstration.
