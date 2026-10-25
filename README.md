@@ -1,17 +1,51 @@
-# student_attendance
+# Student Attendance Management System
 
-A new Flutter project.
+A modern student attendance management application built with Flutter and Dart.
+
+## Features
+- Dashboard with attendance statistics
+- Student management and validation
+- Attendance marking for present and absent students
+- Reports, attendance percentages, and department summaries
+
+## Technology Stack
+- Flutter and Dart
+- Material Design
+- Git and GitHub
 
 ## Getting Started
+1. Install Flutter and Git.
+2. Clone this repository: https://github.com/sreekarb934-alt/student-attendance-management-system
+3. Run: flutter pub get
+4. Launch: flutter run -d chrome
 
-This project is a starting point for a Flutter application.
+## Testing
+Run flutter analyze and flutter test.
+The project passed static analysis and all 11 automated tests during development.
 
-A few resources to get you started if this is your first Flutter project:
+## Current Limitations
+Student and attendance data are stored in memory and do not persist across application restarts.
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+## Future Improvements
+- Persistent database storage
+- Date-wise attendance history
+- Authentication and role-based access
+- CSV and PDF report exports
+- Web deployment
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## License
+No open-source license has been specified yet.
+
+## Application Preview
+
+### Dashboard
+![Dashboard](screenshots/dashboard.png.png)
+
+### Student Management
+![Student Management](screenshots/students.png.png)
+
+### Attendance
+![Attendance](screenshots/attendance.png.png)
+
+### Reports and Analytics
+![Reports and Analytics](screenshots/reports.png.png)
